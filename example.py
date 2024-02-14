@@ -16,7 +16,10 @@ def index():
     email = {}
     errors = {}
     users_cookies = json.loads(request.cookies.get('users_email', json.dumps({})))
-    login = session.get(users_cookies, {})
+    if users_cookies:
+        login = session.get(users_cookies, {})
+    else:
+       login = {}
     if login.get('login', False) :
         return redirect(url_for('home'))
     return render_template('index.html', email=email, errors=errors)
