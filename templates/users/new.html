@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <h1>New User</h1>
+    <h1>Новый Пользователь</h1>
   </head>
     <body>
       <div>
         <ul>
           <li><a href="{{ url_for('index') }}"> Главная</a></li>
-          <li><a href="{{ url_for('courses') }}"> Курсы</a></li>
           <li><a href="{{ url_for('users') }}">Пользователи</a></li>
         </ul>
     </div>
@@ -15,7 +14,7 @@
     <form action="{{ url_for('users') }}" method="post">
       <div>
         <label>
-          First name
+          Имя:
           <input type="text" required name="first_name" value="{{ user.first_name|default('', true) }}">
         </label>
         {% if errors['first_name'] %}
@@ -24,7 +23,7 @@
       </div>
       <div>
         <label>
-          Last name:
+          Фамилия:
           <input type="text" required name="last_name" value="{{ user.last_name|default('', true) }}">
         </label>
         {% if errors['last_name'] %}
@@ -40,7 +39,25 @@
         <div style="color:red">{{ errors['email'] }}</div>
         {% endif %}
         </div>
-      <input type="submit" value="Sign Up">
+        <div>
+          <label>
+            Пароль:
+            <input type="password" required name="password" value="{{user.password|default('', true) }}">
+          </label>
+          {% if errors['password'] %}
+          <div style="color:red">{{ errors['password'] }}</div>
+          {% endif %}
+        </div>
+        <div>
+          <label>
+            Подтверждение пароля:
+            <input type="password" required name="password_conf" value="{{user.password_conf|default('', true) }}">
+          </label>
+          {% if errors['password_conf'] %}
+          <div style="color:red">{{ errors['password_conf'] }}</div>
+          {% endif %}
+        </div>
+      <input type="submit" value="Зарегестрироваться">
     </form>
   </body>
 </html>

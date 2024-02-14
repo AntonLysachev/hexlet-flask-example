@@ -1,19 +1,20 @@
 from flask import Flask, request, redirect, render_template, make_response, url_for, flash, get_flashed_messages, session
 import json
-from CRUD.validator import validate, validate_email, validate_update, is_login
-from CRUD.saver import user_save, user_save_cookie, email_save_cookie
+from CRUD.validator import validate, validate_login, validate_update, is_login
+from CRUD.saver import user_save, email_save_cookie
 from CRUD.updator import user_update
 from CRUD.deleter import user_delete
+from CRUD.getter import get_user
 
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
-list_courses = [{'id':1, 'name':'Первый' }, {'id':2, 'name':'Второй' }, {'id':3, 'name':'Третий' }, {'id':4, 'name':'Четвертый' }]
+
 
 @app.route('/')
 def index():
     url_for('index')
-    email = {}
+    user = {}
     errors = {}
     users_cookies = json.loads(request.cookies.get('users_email', json.dumps({})))
     if users_cookies:
@@ -22,83 +23,63 @@ def index():
        login = {}
     if login.get('login', False) :
         return redirect(url_for('home'))
-    return render_template('index.html', email=email, errors=errors)
+    return render_template('index.html', user=user, errors=errors)
 
 
 @app.post('/login')
 def login():
     url_for('login')
-    email = request.form.get('email')
-    errors = validate_email(email)
+    user = request.form.to_dict()
+    errors = validate_login(user)
     if errors:
-        return render_template('index.html', email=email, errors=errors), 422
-    session.update({email: {'login': True}})
+        return render_template('index.html', user=user, errors=errors), 422
+    user = get_user(user)
+    session.update({str(user[0][0]): {'login': True}})
     response = redirect(url_for('home'))
-    response.set_cookie('users_email', json.dumps(email))
-    flash(f'Вы вошли', 'success')
+    response.set_cookie('users_id', json.dumps(user[0][0]))
+    flash(f'Вы вошли как {user[0][1]}' , 'success')
+    print(f'{session[str(user[0][0])]}{user[0][1]}')
     return response
 
 @app.post('/logout')
 def logout():
     url_for('logout')
-    email = json.loads(request.cookies.get('users_email', json.dumps({})))
-    session.update({email: {'login': False}})
+    user_id= json.loads(request.cookies.get('users_id', json.dumps({})))
+    print(user_id)
+    session.update({str(user_id): {'login': False}})
     return redirect('/')
 
 @app.get('/home')
 def home():
     url_for('home')
-    users_cookies = json.loads(request.cookies.get('users_email', json.dumps({})))
-    login = session.get(users_cookies, {})
+    users_cookies = json.loads(request.cookies.get('users_id', json.dumps({})))
+    login = session.get(str(users_cookies), {})
     messages = get_flashed_messages(with_categories=True)
     if login.get('login', False):
         return render_template('home.html', messages=messages, session=session)
     return redirect(url_for('index'))
 
-@app.route('/courses')
-def courses():
-    url_for('courses')
-    return render_template('courses/index.html', courses=list_courses)
-
-
 @app.route('/users')
 def users():
-  url_for('users')
-  term = request.args.get('term')
-  with open('resurses/user_bd.json', 'r') as rf:
-    db = json.load(rf)
-    db.pop('id')
-    users = db
+    url_for('users')
+    term = request.args.get('term')
+    users_cookies = json.loads(request.cookies.get('users_id', json.dumps({})))
+    login = session.get(str(users_cookies), {})
     messages = get_flashed_messages(with_categories=True)
-  if term:
-    filtered_users = {}
-    for id, data in users.items():
-      if data['first_name'].lower().startswith(term):
-        filtered_users.update({id: data})
-    if filtered_users:
-      return render_template('users/index.html', users=filtered_users, messages=messages, search=term)
-    return render_template('users/index.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
-  return render_template('users/index.html', users=users, messages=messages, search='')
+    if not login.get('login', False):
+        return redirect(url_for('index'))
+    if term:
+        filtered_users = {}
+        for id, data in users.items():
+            if data['first_name'].lower().startswith(term):
+                filtered_users.update({id: data})
+        if filtered_users:
+            return render_template('users/index.html', users=filtered_users, messages=messages, search=term)
+        return render_template('users/index.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
+    return render_template('users/index.html', users=users, messages=messages, search='')
 
 
-# @app.route('/users')
-# def users():
-#     url_for('users')
-#     term = request.args.get('term')
-#     users_cookies = json.loads(request.cookies.get('users', json.dumps({})))
-#     users_cookies.pop('id')
-#     messages = get_flashed_messages(with_categories=True)
-#     if term:
-#         filtered_users = {}
-#         for id, data in users_cookies:
-#             if data['first_name'].lower().startswith(term):
-#                 filtered_users.update({id: data})
-#         if filtered_users:
-#             return render_template('users/index.html', users=filtered_users, messages=messages, search=term)
-#         return render_template('users/index.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
-#     return render_template('users/index.html', users=users_cookies, messages=messages, search='')
-
-@app.route('/users/new')
+@app.get('/users/new')
 def new_user():
     url_for('new_user')
     user = {}
@@ -108,22 +89,17 @@ def new_user():
 
 @app.post('/users')
 def new_user_post():
-  user = request.form.to_dict()
-  errors = validate(user)
-  if errors:
-     return render_template('users/new.html', user=user, errors=errors), 422
-  user_save(user)
-  flash(f'Новый пользователь: {user["first_name"]}, добавлен', 'success')
-  return redirect('/users')
+    user = request.form.to_dict()
+    errors = validate(user)
+    if errors:
+        return render_template('users/new.html', user=user, errors=errors), 422
+    user_id = user_save(user)
+    session.update({str(user_id) : {'login': True}})
+    response = redirect(url_for('home'))
+    response.set_cookie('users_id', json.dumps(user_id))
+    flash(f'Новый пользователь: {user["first_name"]}, добавлен', 'success')
+    return response
 
-# @app.post('/users')
-# def new_user_post():
-#     user = request.form.to_dict()
-#     users_cookies = json.loads(request.cookies.get('users', json.dumps({})))
-#     response = make_response(redirect('/users'))
-#     response.set_cookie('users', user_save_cookie(user, users_cookies))
-#     flash(f'Новый пользователь: {user["first_name"]}, добавлен', 'success')
-#     return response
 
 @app.route('/users/<int:id>')
 def user(id):
@@ -146,7 +122,7 @@ def edit_user(id):
     return render_template('users/edit.html', user=user, errors=errors)
 
 
-@app.route('/user/<id>/patch', methods=['POST'])
+@app.post('/user/<id>/patch')
 def patch_user(id):
     url_for('patch_user', id=id)
     with open('resurses/user_bd.json', 'r') as rf:
