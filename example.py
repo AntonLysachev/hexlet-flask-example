@@ -48,7 +48,6 @@ def home():
     users_cookies = json.loads(request.cookies.get('users_email', json.dumps({})))
     login = session.get(users_cookies, {})
     messages = get_flashed_messages(with_categories=True)
-    print(session)
     if login.get('login', False):
         return render_template('home.html', messages=messages, session=session)
     return redirect(url_for('index'))
