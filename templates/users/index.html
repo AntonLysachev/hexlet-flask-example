@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Example application</title>
+    <h1>Users</h1>
+    {% if messages %}
+      <ul class=flashes style="color: green">
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+      </ul>
+    {% endif %}
+  </head>
+  <body>    
+    <div>
+      <ul>
+        <li><a href="{{ url_for('index') }}"> Главная</a></li>
+        <li><a href="{{ url_for('courses') }}"> Курсы</a></li>
+        <li><a href="{{ url_for('new_user') }}">Новый пользователь</a></li>
+      </ul>
+    </div>
+    <hr>    
+      <form action="{{ url_for('users') }}" method="get">
+      <input type="search" name="term" value="{{ search }}" />
+      <input type="submit" value="Search" />
+    </form>
+    <ul>
+      {% if users['answer'] %}
+      <li>{{ users.answer }}</li>
+      {% endif %}
+        <table>
+          {% if users %}
+          {% for user in users.values() %}
+            <tr>
+              <td>
+                <a href="{{ url_for('user', id=user.id) }}">{{ user.first_name }} {{ user.last_name }}</a>
+              </td>
+              <td>
+                 | 
+              </td>
+              <td>
+                <a href="{{ url_for('edit_user', id=user.id) }}">Редактировать</a>
+              </td>
+              <td>
+                 | 
+              </td>
+              <td>
+                <a href="{{ url_for('delete_user_get', id=user.id) }}">Удалить</a>
+              </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+    </ul>
+  </body>
+</html>

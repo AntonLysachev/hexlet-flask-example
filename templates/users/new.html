@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <h1>New User</h1>
+  </head>
+    <body>
+      <div>
+        <ul>
+          <li><a href="{{ url_for('index') }}"> Главная</a></li>
+          <li><a href="{{ url_for('courses') }}"> Курсы</a></li>
+          <li><a href="{{ url_for('users') }}">Пользователи</a></li>
+        </ul>
+    </div>
+    <hr>
+    <form action="{{ url_for('users') }}" method="post">
+      <div>
+        <label>
+          First name
+          <input type="text" required name="first_name" value="{{ user.first_name|default('', true) }}">
+        </label>
+        {% if errors['first_name'] %}
+          <div style="color: red">{{ errors['first_name'] }}</div>
+        {% endif %}
+      </div>
+      <div>
+        <label>
+          Last name:
+          <input type="text" required name="last_name" value="{{ user.last_name|default('', true) }}">
+        </label>
+        {% if errors['last_name'] %}
+        <div style="color: red">{{ errors['last_name'] }}</div>
+        {% endif %}
+      </div>
+      <div>
+        <label>
+          Email
+          <input type="email" required name="email" value="{{user.email|default('', true) }}">
+        </label>
+        {% if errors['email'] %}
+        <div style="color:red">{{ errors['email'] }}</div>
+        {% endif %}
+        </div>
+      <input type="submit" value="Sign Up">
+    </form>
+  </body>
+</html>

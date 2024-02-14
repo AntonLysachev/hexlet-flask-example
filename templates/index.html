@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <h1>Login</h1>
+    </head>
+    <hr>
+    <body>
+        <form action="{{ url_for('login') }}" method="post">
+            <input type="text" required name="email" value="{{ email|default('', true) }}">
+            <input type="submit" value="Login">
+            {% if errors['email'] %}
+            <div style="color: red">{{ errors['email'] }}</div>
+            {% endif %}
+        </form>
+    </body>
+</html>
+
+

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "hexlet-flask-example"
+version = "0.1.0"
+description = ""
+authors = ["AntonLysachev <anton@lysachev.ru>"]
+readme = "README.md"
+packages = [{include = "hexlet_flask_example"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Flask = "^3.0.2"
+gunicorn = "^21.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.0.0"
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
