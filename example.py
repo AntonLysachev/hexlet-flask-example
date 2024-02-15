@@ -1,11 +1,10 @@
 from flask import Flask, request, redirect, render_template, make_response, url_for, flash, get_flashed_messages, session
 import json
-from CRUD.validator import validate, validate_login, validate_update, is_login
-from CRUD.saver import user_save, email_save_cookie
-from CRUD.updator import user_update
-from CRUD.deleter import user_delete
-from CRUD.getter import get_user
+from validation.validator import validate, validate_update, is_login, authentication
+from CRUD.crud_utils import save, get_column, get_user
 
+
+INSERT_USERS_TABLE = ('users', 'first_name', 'last_name', 'password', 'email')
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -13,75 +12,67 @@ app.secret_key = "secret_key"
 
 @app.route('/')
 def index():
-    url_for('index')
     user = {}
     errors = {}
-    users_cookies = json.loads(request.cookies.get('users_email', json.dumps({})))
-    if users_cookies:
-        login = session.get(users_cookies, {})
-    else:
-       login = {}
-    if login.get('login', False) :
+    if is_login():
         return redirect(url_for('home'))
     return render_template('index.html', user=user, errors=errors)
 
 
 @app.post('/login')
 def login():
-    url_for('login')
     user = request.form.to_dict()
-    errors = validate_login(user)
+    errors = authentication(user)
     if errors:
         return render_template('index.html', user=user, errors=errors), 422
-    user = get_user(user)
-    session.update({str(user[0][0]): {'login': True}})
+    user = get_user('users', 'email', user['email'])
+    id = str(user['id'])
+    first_name = user['first_name']
+    session.update({id: {'login': True}})
     response = redirect(url_for('home'))
-    response.set_cookie('users_id', json.dumps(user[0][0]))
-    flash(f'Вы вошли как {user[0][1]}' , 'success')
-    print(f'{session[str(user[0][0])]}{user[0][1]}')
+    response.set_cookie('users_id', json.dumps(id))
+    flash(f'Вы вошли как {first_name}' , 'success')
+    print(f'id: {id} | user: {first_name} | status: {session[id]}')
     return response
+
 
 @app.post('/logout')
 def logout():
-    url_for('logout')
     user_id= json.loads(request.cookies.get('users_id', json.dumps({})))
-    print(user_id)
-    session.update({str(user_id): {'login': False}})
-    return redirect('/')
+    session.update({user_id: {'login': False}})
+    user = get_user('users', 'id', user_id)
+    print(f'id: {user["id"]} | user: {user["first_name"]} | status: {session[str(user["id"])]}')
+    return redirect(url_for('index'))
+
 
 @app.get('/home')
-def home():
-    url_for('home')
-    users_cookies = json.loads(request.cookies.get('users_id', json.dumps({})))
-    login = session.get(str(users_cookies), {})
+def home():    
     messages = get_flashed_messages(with_categories=True)
-    if login.get('login', False):
-        return render_template('home.html', messages=messages, session=session)
+    if is_login():
+        return render_template('home.html', messages=messages)
     return redirect(url_for('index'))
+
 
 @app.route('/users')
 def users():
-    url_for('users')
     term = request.args.get('term')
-    users_cookies = json.loads(request.cookies.get('users_id', json.dumps({})))
-    login = session.get(str(users_cookies), {})
     messages = get_flashed_messages(with_categories=True)
-    if not login.get('login', False):
-        return redirect(url_for('index'))
-    if term:
-        filtered_users = {}
-        for id, data in users.items():
-            if data['first_name'].lower().startswith(term):
-                filtered_users.update({id: data})
-        if filtered_users:
-            return render_template('users/index.html', users=filtered_users, messages=messages, search=term)
-        return render_template('users/index.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
-    return render_template('users/index.html', users=users, messages=messages, search='')
+    print('users')
+    if is_login():
+        if term:
+            filtered_users = {}
+            for id, data in users.items():
+                if data['first_name'].lower().startswith(term):
+                    filtered_users.update({id: data})
+            if filtered_users:
+                return render_template('users/index.html', users=filtered_users, messages=messages, search=term)
+            return render_template('users/index.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
+        return render_template('users/index.html', users=users, messages=messages, search='')
+    return redirect(url_for('index'))
 
 
 @app.get('/users/new')
 def new_user():
-    url_for('new_user')
     user = {}
     errors={}
     return render_template('users/new.html', user=user, errors=errors)
@@ -93,8 +84,9 @@ def new_user_post():
     errors = validate(user)
     if errors:
         return render_template('users/new.html', user=user, errors=errors), 422
-    user_id = user_save(user)
-    session.update({str(user_id) : {'login': True}})
+    save(INSERT_USERS_TABLE, user)
+    user_id = str(get_column('id', 'users', 'email', user['email']))
+    session.update({user_id: {'login': True}})
     response = redirect(url_for('home'))
     response.set_cookie('users_id', json.dumps(user_id))
     flash(f'Новый пользователь: {user["first_name"]}, добавлен', 'success')
@@ -103,7 +95,6 @@ def new_user_post():
 
 @app.route('/users/<int:id>')
 def user(id):
-    url_for('user', id=id)
     with open('resurses/user_bd.json', 'r') as rf:
         users = json.load(rf)
         id = str(id)    
@@ -114,7 +105,6 @@ def user(id):
 
 @app.route('/user/<id>/edit')
 def edit_user(id):
-    url_for('edit_user', id=id)
     with open('resurses/user_bd.json', 'r') as rf:
         db = json.load(rf)
     user = db[id]
@@ -124,7 +114,6 @@ def edit_user(id):
 
 @app.post('/user/<id>/patch')
 def patch_user(id):
-    url_for('patch_user', id=id)
     with open('resurses/user_bd.json', 'r') as rf:
         db = json.load(rf)
     user = db[id]
@@ -142,7 +131,6 @@ def patch_user(id):
 
 @app.get('/user/<id>/delete')
 def delete_user_get(id):
-    url_for('delete_user_get', id=id)
     with open('resurses/user_bd.json', 'r') as rf:
         db = json.load(rf)
         user = db[id]
@@ -151,7 +139,6 @@ def delete_user_get(id):
 
 @app.post('/user/<id>/delete')
 def delete_user_post(id):
-    url_for('delete_user_post', id=id)
     user_delete(id)
     flash("Пользователь удален", 'seccess')
     return redirect(url_for('users'))
