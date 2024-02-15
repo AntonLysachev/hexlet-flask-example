@@ -53,11 +53,8 @@ def get_column(column_name, table_name, where, value):
         data = cursor.fetchall()
         cursor.close()
         connection.close()
-        print('!!!!')
-        print(data)
     except(Exception) as error : 
         print(error)
-    print(data)
     if data:
         return data[0][0]
     
@@ -66,7 +63,6 @@ def get_column(column_name, table_name, where, value):
 def get_user(table_name, where, value):
     user_data = {}
     data = get_field(table_name, where, value)
-    print(data)
     if data:
         user_data.update({  'id': data[0],
                         'first_name': data[1],
@@ -120,10 +116,10 @@ def update(table_name, column_name, where, new_value, where_value):
     return True
 
 
-def delete(table_name, column_name, values):
+def delete(table_name, where, values):
     query = sql.SQL(DELETE).format(
         sql.Identifier(table_name),
-        sql.Identifier(column_name)
+        sql.Identifier(where)
         )
     try:
         connection = get_connection()

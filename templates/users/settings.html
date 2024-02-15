@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>settings</title>
+    <h1>Настройки</h1>
+</head>
+<body>
+    <div>
+        <ul>
+            <li><a href="{{ url_for('home') }}">Главная</a></li>
+            <li><a href="{{ url_for('users') }}"> Пользователи</a></li>
+        </ul>
+        {% if messages %}
+        <ul class=flashes style="color: green">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <hr>
+    <table>
+        <tr>
+            <td>
+                ID: {{ user.id }} 
+            </td>
+            <td>
+                | 
+            </td>
+            <td>
+                Имя: {{ user.first_name }} 
+            </td>
+            <td>
+                | 
+            </td>
+            <td>
+                Фамилия: {{ user.last_name }} 
+            </td>
+            <td>
+                | 
+            </td>
+            <td>
+                email: {{ user.email }} 
+            </td>
+            <td>
+                | 
+            </td>
+            <td>
+                Пароль: {{ user.password }} 
+            </td>
+        </tr>
+    </table>    
+    <form action="{{ url_for('user_edit_get', id=user.id) }}" method="get">
+        <input type="submit" value="Изминить данные">
+
+    </form>        
+    <form action="{{ url_for('user_delete', id=user.id) }}" method="post" onsubmit="return confirm('Вы действительно хотите удалить пользователя?')">
+         <input type="submit" value="Удалить пользователя">
+    </form>
+</body>
+</html>

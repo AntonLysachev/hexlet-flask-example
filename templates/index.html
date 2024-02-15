@@ -4,6 +4,13 @@
         <title>Login</title>
         <h1>Вход</h1>
     </head>
+    {% if messages %}
+    <ul class=flashes style="color: green">
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+      </ul>
+    {% endif %}
     <hr>
     <body>
         <form action="{{ url_for('login') }}" method="post">

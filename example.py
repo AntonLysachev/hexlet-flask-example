@@ -1,7 +1,7 @@
-from flask import Flask, request, redirect, render_template, make_response, url_for, flash, get_flashed_messages, session
+from flask import Flask, request, redirect, render_template, url_for, flash, get_flashed_messages, session
 import json
 from validation.validator import validate, validate_update, is_login, authentication
-from CRUD.crud_utils import save, get_column, get_user, to_string_table
+from CRUD.crud_utils import save, get_column, get_user, to_string_table , update, delete
 
 
 INSERT_USERS_TABLE = ('users', 'first_name', 'last_name', 'password', 'email')
@@ -14,9 +14,10 @@ app.secret_key = "secret_key"
 def index():
     user = {}
     errors = {}
+    messages = get_flashed_messages(with_categories=True)
     if is_login():
         return redirect(url_for('home'))
-    return render_template('index.html', user=user, errors=errors)
+    return render_template('index.html', user=user, errors=errors, messages=messages)
 
 
 @app.post('/login')
@@ -36,20 +37,21 @@ def login():
     return response
 
 
-@app.post('/logout')
+@app.get('/logout')
 def logout():
     user_id= json.loads(request.cookies.get('users_id', json.dumps({})))
+    print(user_id)
     session.update({user_id: {'login': False}})
-    user = get_user('users', 'id', user_id)
-    print(f'id: {user["id"]} | user: {user["first_name"]} | status: {session[str(user["id"])]}')
-    return redirect(url_for('index'))
+    response = redirect(url_for('index')) 
+    return response
 
 
 @app.get('/home')
-def home():    
+def home():
+    user_id = json.loads(request.cookies.get('users_id', json.dumps({})))
     messages = get_flashed_messages(with_categories=True)
     if is_login():
-        return render_template('home.html', messages=messages)
+        return render_template('home.html', messages=messages, id=user_id)
     return redirect(url_for('index'))
 
 
@@ -93,61 +95,39 @@ def new_user_post():
     return response
 
 
-@app.route('/users/<int:id>')
-def user(id):
-    with open('resurses/user_bd.json', 'r') as rf:
-        users = json.load(rf)
-        id = str(id)    
-        if id in users:
-          return render_template('users/show.html', user=users[id])
-    return redirect('/users/page_not_found')
+@app.get('/user/<id>/settings')
+def user_settings(id):
+    messages = get_flashed_messages(with_categories=True)
+    user = get_user('users', 'id', id)
+    return render_template('users/settings.html', user=user, messages=messages)
 
 
-@app.route('/user/<id>/edit')
-def edit_user(id):
-    with open('resurses/user_bd.json', 'r') as rf:
-        db = json.load(rf)
-    user = db[id]
+@app.get('/user/<id>/edit')
+def user_edit_get(id):
     errors = {}
+    user = get_user('users', 'id', id)
     return render_template('users/edit.html', user=user, errors=errors)
 
 
-@app.post('/user/<id>/patch')
-def patch_user(id):
-    with open('resurses/user_bd.json', 'r') as rf:
-        db = json.load(rf)
-    user = db[id]
+@app.post('/user/<id>/edit')
+def user_edit_post(id):
     data = request.form.to_dict()
-    data['id'] = user['id']
-    errors = validate_update(data)
-    if errors:
-        return render_template('users/edit.html', user=data, errors=errors), 422
-    user.update(data)
-    db[id] = user
-    user_update(db)
-    flash('Данные пользователя обнавлены', 'seccess')
-    return redirect(url_for('users'))
-
-
-@app.get('/user/<id>/delete')
-def delete_user_get(id):
-    with open('resurses/user_bd.json', 'r') as rf:
-        db = json.load(rf)
-        user = db[id]
-    return render_template('/users/delete.html', user=user)
+    user = get_user('users', 'id', id)
+    for column, new in data.items():
+        if user[column] != new:
+            update('users', column, 'id', new, id)
+    flash('Данные изменены', 'success')
+    return redirect(url_for('user_settings', id=id))
 
 
 @app.post('/user/<id>/delete')
-def delete_user_post(id):
-    user_delete(id)
-    flash("Пользователь удален", 'seccess')
-    return redirect(url_for('users'))
+def user_delete(id):
+    user = get_user('users', 'id', id)
+    delete('users', 'id', id)
+    response = redirect(url_for('logout'))
+    flash(f'Пользователь {user["first_name"]} был удален')
+    return response
 
-
-@app.get('/users/page_not_found')
-def user_page_not_found():
-    url_for('user_page_not_found')
-    return render_template('users/page_not_found.html')
 
 if __name__ == '__main__':
    app.run(debug=True)
