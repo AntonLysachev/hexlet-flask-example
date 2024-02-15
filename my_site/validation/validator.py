@@ -1,5 +1,5 @@
 from flask import request, session
-from CRUD.crud_utils import get_column, get_user
+from my_site.CRUD.crud_utils import get_column, get_user
 import json
 
 

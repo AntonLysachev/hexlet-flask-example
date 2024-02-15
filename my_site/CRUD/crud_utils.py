@@ -1,4 +1,4 @@
-from CRUD.db_util import get_connection
+from my_site.CRUD.db_util import get_connection
 from psycopg2 import sql
 
 GET_TABLE = 'SELECT * FROM {} ORDER BY "id"'

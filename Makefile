@@ -2,7 +2,7 @@ install:
 		poetry install
 
 start:
-		flask --app example --debug run --port 8000
+		flask --app my_site/example --debug run --port 8000
 
 env-start:
 		poetry run flask --app example --debug run --port 8000

@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template, url_for, flash, get_flashed_messages, session
 import json
-from validation.validator import validate, validate_update, is_login, authentication
-from CRUD.crud_utils import save, get_column, get_user, to_string_table , update, delete
+from my_site.validation.validator import validate, is_login, authentication
+from my_site.CRUD.crud_utils import save, get_column, get_user, to_string_table , update, delete
 
 
 INSERT_USERS_TABLE = ('users', 'first_name', 'last_name', 'password', 'email')
