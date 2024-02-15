@@ -1,7 +1,7 @@
 from CRUD.db_util import get_connection
 from psycopg2 import sql
 
-GET_TABLE = 'SELECT * FROM {}'
+GET_TABLE = 'SELECT * FROM {} ORDER BY "id"'
 GET_FIELD = 'SELECT * FROM {} WHERE {} = %s'
 GET_COLUMN = 'SELECT {} FROM {} WHERE {} =%s'
 INSERT = 'INSERT INTO {} ({}, {}, {}, {}) VALUES (%s, %s, %s, %s)'
@@ -134,5 +134,13 @@ def delete(table_name, column_name, values):
     
     return True
 
-
-
+def to_string_table(table):
+    users = []
+    data = get_table(table)
+    for user in data:
+        users.append({ 'id': user[0],
+                    'first_name': user[1],
+                    'last_name': user[2],
+                    'password': user[3],
+                    'email': user[4]})
+    return users

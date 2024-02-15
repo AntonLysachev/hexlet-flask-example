@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Example application</title>
-    <h1>Users</h1>
+    <h1>Пользователи</h1>
     {% if messages %}
       <ul class=flashes style="color: green">
     {% for category, message in messages %}
@@ -27,5 +27,33 @@
       <li>{{ users.answer }}</li>
       {% endif %}
     </ul>
+    <table>
+      {% if users %}
+      {% for user in users %}
+        <tr>
+          <td>
+              ID: {{ user.id }} 
+          </td>
+          <td>
+              | 
+          </td>
+          <td>
+              Имя: {{ user.first_name }} 
+          </td>
+          <td>
+              | 
+          </td>
+          <td>
+              Фамилия: {{ user.last_name }} 
+          </td>
+          <td>
+              | 
+          </td>
+          <td>
+              email: {{ user.email }} 
+          </td>
+        {% endfor %}
+        {% endif %}
+    </table>
   </body>
 </html>

@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template, make_response, url_for, flash, get_flashed_messages, session
 import json
 from validation.validator import validate, validate_update, is_login, authentication
-from CRUD.crud_utils import save, get_column, get_user
+from CRUD.crud_utils import save, get_column, get_user, to_string_table
 
 
 INSERT_USERS_TABLE = ('users', 'first_name', 'last_name', 'password', 'email')
@@ -57,13 +57,13 @@ def home():
 def users():
     term = request.args.get('term')
     messages = get_flashed_messages(with_categories=True)
-    print('users')
     if is_login():
+        users = to_string_table('users')
         if term:
-            filtered_users = {}
-            for id, data in users.items():
-                if data['first_name'].lower().startswith(term):
-                    filtered_users.update({id: data})
+            filtered_users = []
+            for user in users:
+                if user['first_name'].lower().startswith(term.lower()):
+                    filtered_users.append(user)
             if filtered_users:
                 return render_template('users/index.html', users=filtered_users, messages=messages, search=term)
             return render_template('users/index.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
