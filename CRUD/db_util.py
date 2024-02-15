@@ -4,7 +4,6 @@ import os
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 PATH = f"{DIR}/config_connect.json"
-
 def get_connection():
     try:
         with open(PATH, 'r') as f:

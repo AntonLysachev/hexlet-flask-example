@@ -33,12 +33,11 @@ def get_field(table_name, where, value):
         connection = get_connection()
         cursor = connection.cursor()
         cursor.execute(query, (value,))
-        data = cursor.fetchall()
+        data = cursor.fetchone()
         cursor.close()
         connection.close()
     except(Exception) as error : 
         print(error)
-
     return data
 
 
@@ -54,8 +53,11 @@ def get_column(column_name, table_name, where, value):
         data = cursor.fetchall()
         cursor.close()
         connection.close()
+        print('!!!!')
+        print(data)
     except(Exception) as error : 
         print(error)
+    print(data)
     if data:
         return data[0][0]
     
@@ -64,7 +66,8 @@ def get_column(column_name, table_name, where, value):
 def get_user(table_name, where, value):
     user_data = {}
     data = get_field(table_name, where, value)
-    user_data.update({  'id': data[0][0],
+    if data:
+        user_data.update({  'id': data[0][0],
                         'first_name': data[0][1],
                         'last_name': data[0][2],
                         'password': data[0][3],
