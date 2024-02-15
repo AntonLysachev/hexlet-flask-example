@@ -66,12 +66,13 @@ def get_column(column_name, table_name, where, value):
 def get_user(table_name, where, value):
     user_data = {}
     data = get_field(table_name, where, value)
+    print(data)
     if data:
-        user_data.update({  'id': data[0][0],
-                        'first_name': data[0][1],
-                        'last_name': data[0][2],
-                        'password': data[0][3],
-                        'email': data[0][4]})
+        user_data.update({  'id': data[0],
+                        'first_name': data[1],
+                        'last_name': data[2],
+                        'password': data[3],
+                        'email': data[4]})
     return user_data
 
 
