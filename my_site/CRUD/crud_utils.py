@@ -13,12 +13,12 @@ def get_table(table_name):
     query = sql.SQL(GET_TABLE).format(sql.Identifier(table_name))
     try:
         connection = get_connection()
-        cursor = connection.cursor()    
+        cursor = connection.cursor()
         cursor.execute(query)
         data = cursor.fetchall()
         cursor.close()
         connection.close()
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
 
     return data
@@ -27,8 +27,7 @@ def get_table(table_name):
 def get_field(table_name, where, value):
     query = sql.SQL(GET_FIELD).format(
         sql.Identifier(table_name),
-        sql.Identifier(where)
-        )
+        sql.Identifier(where))
     try:
         connection = get_connection()
         cursor = connection.cursor()
@@ -36,16 +35,16 @@ def get_field(table_name, where, value):
         data = cursor.fetchone()
         cursor.close()
         connection.close()
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
+
     return data
 
 
 def get_column(column_name, table_name, where, value):
-    query = sql.SQL(GET_COLUMN).format(
-            sql.Identifier(column_name),
-            sql.Identifier(table_name),
-            sql.Identifier(where))
+    query = sql.SQL(GET_COLUMN).format(sql.Identifier(column_name),
+                                       sql.Identifier(table_name),
+                                       sql.Identifier(where))
     try:
         connection = get_connection()
         cursor = connection.cursor()
@@ -53,22 +52,24 @@ def get_column(column_name, table_name, where, value):
         data = cursor.fetchall()
         cursor.close()
         connection.close()
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
     if data:
         return data[0][0]
-    
+
     return data
+
 
 def get_user(table_name, where, value):
     user_data = {}
     data = get_field(table_name, where, value)
     if data:
-        user_data.update({  'id': data[0],
-                        'first_name': data[1],
-                        'last_name': data[2],
-                        'password': data[3],
-                        'email': data[4]})
+        user_data.update({'id': data[0],
+                          'first_name': data[1],
+                          'last_name': data[2],
+                          'password': data[3],
+                          'email': data[4]})
+
     return user_data
 
 
@@ -82,14 +83,14 @@ def save(args, user):
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute(query, (first_name, 
-                                last_name, 
-                                password, 
-                                email,))
+        cursor.execute(query, (first_name,
+                               last_name,
+                               password,
+                               email,))
         connection.commit()
         cursor.close()
         connection.close()
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
         return False
 
@@ -97,11 +98,9 @@ def save(args, user):
 
 
 def update(table_name, column_name, where, new_value, where_value):
-    query = sql.SQL(UPDATE).format(
-                    sql.Identifier(table_name),
-                    sql.Identifier(column_name),
-                    sql.Identifier(where)
-        )
+    query = sql.SQL(UPDATE).format(sql.Identifier(table_name),
+                                   sql.Identifier(column_name),
+                                   sql.Identifier(where))
     try:
         connection = get_connection()
         cursor = connection.cursor()
@@ -109,7 +108,7 @@ def update(table_name, column_name, where, new_value, where_value):
         connection.commit()
         cursor.close()
         connection.close()
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
         return False
 
@@ -117,10 +116,8 @@ def update(table_name, column_name, where, new_value, where_value):
 
 
 def delete(table_name, where, values):
-    query = sql.SQL(DELETE).format(
-        sql.Identifier(table_name),
-        sql.Identifier(where)
-        )
+    query = sql.SQL(DELETE).format(sql.Identifier(table_name),
+                                   sql.Identifier(where))
     try:
         connection = get_connection()
         cursor = connection.cursor()
@@ -128,19 +125,21 @@ def delete(table_name, where, values):
         connection.commit()
         cursor.close()
         connection.close()
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
         return False
-    
+
     return True
+
 
 def to_string_table(table):
     users = []
     data = get_table(table)
     for user in data:
-        users.append({ 'id': user[0],
-                    'first_name': user[1],
-                    'last_name': user[2],
-                    'password': user[3],
-                    'email': user[4]})
+        users.append({'id': user[0],
+                      'first_name': user[1],
+                      'last_name': user[2],
+                      'password': user[3],
+                      'email': user[4]})
+
     return users

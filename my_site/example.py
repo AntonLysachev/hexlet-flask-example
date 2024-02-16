@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template, url_for, flash, get_flashed_messages, session
 import json
 from my_site.validation.validator import validate, is_login, authentication
-from my_site.CRUD.crud_utils import save, get_column, get_user, to_string_table , update, delete
+from my_site.CRUD.crud_utils import save, get_column, get_user, to_string_table, update, delete
 
 
 INSERT_USERS_TABLE = ('users', 'first_name', 'last_name', 'password', 'email')
@@ -32,17 +32,17 @@ def login():
     session.update({id: {'login': True}})
     response = redirect(url_for('home'))
     response.set_cookie('users_id', json.dumps(id))
-    flash(f'Вы вошли как {first_name}' , 'success')
+    flash(f'Вы вошли как {first_name}', 'success')
     print(f'id: {id} | user: {first_name} | status: {session[id]}')
     return response
 
 
 @app.get('/logout')
 def logout():
-    user_id= json.loads(request.cookies.get('users_id', json.dumps({})))
+    user_id = json.loads(request.cookies.get('users_id', json.dumps({})))
     print(user_id)
     session.update({user_id: {'login': False}})
-    response = redirect(url_for('index')) 
+    response = redirect(url_for('index'))
     return response
 
 
@@ -76,7 +76,7 @@ def users():
 @app.get('/users/new')
 def new_user():
     user = {}
-    errors={}
+    errors = {}
     return render_template('users/new.html', user=user, errors=errors)
 
 
@@ -130,4 +130,4 @@ def user_delete(id):
 
 
 if __name__ == '__main__':
-   app.run(debug=True)
+    app.run(debug=True)

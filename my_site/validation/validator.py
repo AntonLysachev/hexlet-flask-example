@@ -9,9 +9,9 @@ def authentication(user):
     password = user['password']
     user = get_user('users', 'email', email)
     if not user:
-      errors['email'] = 'Пользователь с таким email не зарегестрирован'
+        errors['email'] = 'Пользователь с таким email не зарегестрирован'
     elif password != user['password']:
-       errors['password'] = 'Неверный пароль'
+        errors['password'] = 'Неверный пароль'
     return errors
 
 
@@ -20,7 +20,7 @@ def is_login():
     if users_cookies:
         login = session.get(users_cookies, {})
     else:
-       login = {}
+        login = {}
     return login.get('login', False)
 
 
@@ -44,15 +44,16 @@ def validate(user):
         errors['last_name'] = 'Короткая фамилия'
     return errors
 
-def validate_update(user):
-  errors = {}
-  first_name = user['first_name']
-  last_name = user['last_name']
 
-  if first_name:
-    if len(first_name) < 3:
-       errors['first_name'] = 'Короткое имя'
-  if last_name:
-    if len(last_name) < 3:
-      errors['last_name'] = 'Короткая фамилия'
-  return errors
+def validate_update(user):
+    errors = {}
+    first_name = user['first_name']
+    last_name = user['last_name']
+
+    if first_name:
+        if len(first_name) < 3:
+            errors['first_name'] = 'Короткое имя'
+    if last_name:
+        if len(last_name) < 3:
+            errors['last_name'] = 'Короткая фамилия'
+    return errors

@@ -1,6 +1,9 @@
 install:
 		poetry install
 
+lint:
+		poetry run flake8 my_site
+
 start:
 		flask --app my_site/example --debug run --port 8000
 

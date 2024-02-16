@@ -4,6 +4,8 @@ import os
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 PATH = f"{DIR}/config_connect.json"
+
+
 def get_connection():
     try:
         with open(PATH, 'r') as f:
@@ -15,7 +17,7 @@ def get_connection():
         database_name = config['database_name']
 
         connection = psycopg2.connect(f'postgresql://{user}:{password}@{host}:{port}/{database_name}')
-    except(Exception) as error : 
+    except (Exception) as error:
         print(error)
 
     return connection
