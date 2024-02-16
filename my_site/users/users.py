@@ -14,9 +14,7 @@ def index():
         users = to_string_table('users')
         if term:
             filtered_users = list(filter(lambda user: user['first_name'].lower().startswith(term.lower()), users))
-            if filtered_users:
-                return render_template('users.html', users=filtered_users, messages=messages, search=term)
-            return render_template('users.html', users={'answer': "Совпадений не найдено"}, messages=messages, search=term)
+            return render_template('users.html', users=filtered_users, messages=messages, search=term)
         return render_template('users.html', users=users, messages=messages, search='')
     return redirect(url_for('auth.index'))
 
