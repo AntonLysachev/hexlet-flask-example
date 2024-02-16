@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, render_template, url_for, flash, get_flashed_messages, session
 import json
-from my_site.validation.validator import validate, is_login
+from my_site.validation.validator import validate, is_login, validate_update
 from my_site.CRUD.crud_utils import save, get_column, get_user, to_string_table, update, delete
 from my_site.constants import INSERT_USERS_TABLE
 
@@ -61,6 +61,9 @@ def user_edit_get(id):
 def user_edit_post(id):
     data = request.form.to_dict()
     user = get_user('users', 'id', id)
+    errors = validate_update(data)
+    if errors:
+        return render_template('edit.html', user=user, errors=errors ), 422
     for column, new in data.items():
         if user[column] != new:
             update('users', column, 'id', new, id)
