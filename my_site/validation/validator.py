@@ -50,10 +50,8 @@ def validate_update(user):
     first_name = user['first_name']
     last_name = user['last_name']
 
-    if first_name:
-        if len(first_name) < 3:
-            errors['first_name'] = 'Короткое имя'
-    if last_name:
-        if len(last_name) < 3:
-            errors['last_name'] = 'Короткая фамилия'
+    if len(first_name) < 3:
+        errors['first_name'] = 'Короткое имя'
+    if len(last_name) < 3:
+        errors['last_name'] = 'Короткая фамилия'
     return errors
