@@ -1,12 +1,6 @@
 from my_site.CRUD.db_util import get_connection
 from psycopg2 import sql
-
-GET_TABLE = 'SELECT * FROM {} ORDER BY "id"'
-GET_FIELD = 'SELECT * FROM {} WHERE {} = %s'
-GET_COLUMN = 'SELECT {} FROM {} WHERE {} =%s'
-INSERT = 'INSERT INTO {} ({}, {}, {}, {}) VALUES (%s, %s, %s, %s)'
-UPDATE = 'UPDATE {} SET {} = %s WHERE {} = %s'
-DELETE = 'DELETE FROM {} WHERE {} = %s'
+from my_site.constants import GET_COLUMN, GET_FIELD, GET_TABLE, INSERT, UPDATE, DELETE
 
 
 def get_table(table_name):

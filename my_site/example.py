@@ -2,9 +2,9 @@ from flask import Flask, request, redirect, render_template, url_for, flash, get
 import json
 from my_site.validation.validator import validate, is_login, authentication
 from my_site.CRUD.crud_utils import save, get_column, get_user, to_string_table, update, delete
+from my_site.constants import INSERT_USERS_TABLE
 
 
-INSERT_USERS_TABLE = ('users', 'first_name', 'last_name', 'password', 'email')
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
