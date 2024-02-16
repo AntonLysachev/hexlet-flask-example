@@ -14,10 +14,10 @@
     <body>
         <div>
             <ul>
-                <li><a href="{{ url_for('users') }}"> Пользователи</a></li>
-                <li><a href="{{ url_for('user_settings', id=id) }}">Настройки</a></li>
+                <li><a href="{{ url_for('users.index') }}"> Пользователи</a></li>
+                <li><a href="{{ url_for('users.settings', id=id) }}">Настройки</a></li>
             </ul>
-            <form action="{{ url_for('logout') }}" method="get">
+            <form action="{{ url_for('auth.logout') }}" method="get">
                 <input type="submit" value="Logout">
             </form>
             <hr>

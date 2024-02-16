@@ -6,12 +6,12 @@
     <body>
       <div>
         <ul>
-          <li><a href="{{ url_for('index') }}"> Главная</a></li>
-          <li><a href="{{ url_for('users') }}">Пользователи</a></li>
+          <li><a href="{{ url_for('auth.index') }}"> Главная</a></li>
+          <li><a href="{{ url_for('users.index') }}">Пользователи</a></li>
         </ul>
     </div>
     <hr>
-    <form action="{{ url_for('users') }}" method="post">
+    <form action="{{ url_for('users.new_user_post') }}" method="post">
       <div>
         <label>
           Имя:

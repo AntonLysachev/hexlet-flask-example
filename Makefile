@@ -5,7 +5,7 @@ lint:
 		poetry run flake8 my_site
 
 start:
-		flask --app my_site/example --debug run --port 8000
+		flask --app my_site/scripts/example --debug run --port 8000
 
 env-start:
 		poetry run flask --app example --debug run --port 8000

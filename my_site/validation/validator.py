@@ -1,4 +1,4 @@
-from flask import request, session
+from flask import request, session, make_response
 from my_site.CRUD.crud_utils import get_column, get_user
 import json
 
@@ -11,7 +11,7 @@ def authentication(user):
     if not user:
         errors['email'] = 'Пользователь с таким email не зарегестрирован'
     elif password != user['password']:
-        errors['password'] = 'Неверный пароль'
+        errors['password'] = 'Пароли не совпадают'
     return errors
 
 

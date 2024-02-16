@@ -7,8 +7,8 @@
 <body>
     <div>
         <ul>
-            <li><a href="{{ url_for('home') }}">Главная</a></li>
-            <li><a href="{{ url_for('users') }}"> Пользователи</a></li>
+            <li><a href="{{ url_for('home.index') }}">Главная</a></li>
+            <li><a href="{{ url_for('users.index') }}"> Пользователи</a></li>
         </ul>
         {% if messages %}
         <ul class=flashes style="color: green">
@@ -50,11 +50,11 @@
             </td>
         </tr>
     </table>    
-    <form action="{{ url_for('user_edit_get', id=user.id) }}" method="get">
+    <form action="{{ url_for('users.user_edit_get', id=user.id) }}" method="get">
         <input type="submit" value="Изминить данные">
 
     </form>        
-    <form action="{{ url_for('user_delete', id=user.id) }}" method="post" onsubmit="return confirm('Вы действительно хотите удалить пользователя?')">
+    <form action="{{ url_for('users.user_delete', id=user.id) }}" method="post" onsubmit="return confirm('Вы действительно хотите удалить пользователя?')">
          <input type="submit" value="Удалить пользователя">
     </form>
 </body>
