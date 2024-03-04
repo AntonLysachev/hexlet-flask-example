@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, render_template, url_for, get_flashed_messages
 import json
-from my_site.validation.validator import is_login
+from my_site.auth.auth import is_login
 
 home = Blueprint('home', __name__, template_folder='templates/home', static_folder='static')
 

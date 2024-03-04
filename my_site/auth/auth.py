@@ -1,6 +1,5 @@
 from flask import Blueprint, request, redirect, render_template, url_for, flash, get_flashed_messages, session
 import json
-from my_site.validation.validator import is_login, authentication
 from my_site.CRUD.crud_utils import get_user
 
 auth = Blueprint('auth', __name__, template_folder='templates/auth', static_folder='static')
@@ -39,3 +38,24 @@ def logout():
     session.update({user_id: {'login': False}})
     response = redirect(url_for('.index'))
     return response
+
+
+def authentication(user):
+    errors = {}
+    email = user['email']
+    password = user['password']
+    user = get_user('users', 'email', email)
+    if not user:
+        errors['email'] = 'Пользователь с таким email не зарегестрирован'
+    elif password != user['password']:
+        errors['password'] = 'Пароли не совпадают'
+    return errors
+
+
+def is_login():
+    user_cookies = json.loads(request.cookies.get('users_id', json.dumps({})))
+    if user_cookies:
+        login = session.get(user_cookies, {})
+    else:
+        login = {}
+    return login.get('login', False)

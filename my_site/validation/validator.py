@@ -1,27 +1,5 @@
-from flask import request, session, make_response
+from flask import request, session
 from my_site.CRUD.crud_utils import get_column, get_user
-import json
-
-
-def authentication(user):
-    errors = {}
-    email = user['email']
-    password = user['password']
-    user = get_user('users', 'email', email)
-    if not user:
-        errors['email'] = 'Пользователь с таким email не зарегестрирован'
-    elif password != user['password']:
-        errors['password'] = 'Пароли не совпадают'
-    return errors
-
-
-def is_login():
-    users_cookies = json.loads(request.cookies.get('users_id', json.dumps({})))
-    if users_cookies:
-        login = session.get(users_cookies, {})
-    else:
-        login = {}
-    return login.get('login', False)
 
 
 def validate(user):
